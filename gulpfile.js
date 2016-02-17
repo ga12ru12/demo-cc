@@ -213,6 +213,13 @@ var tasks = {
 /***************** KHAI BÁO TASK *****************/
 underscore.each($dst, function(config, name){
     var target = underscore.extend( $dst[name], $path );
+
+    gulp.task('transform', function () {
+        return gulp.src('*.jsx')
+          .pipe(react({harmony: false, es6module: true}))
+          .pipe(gulp.dest('output'));
+    });
+
     gulp.task('clean-' + name, function(){
         return tasks.clean(target);
     });
@@ -240,10 +247,10 @@ underscore.each($dst, function(config, name){
     // gulp.task('babel-' + name, ['react-' + name], function(){
     // 	return tasks.babel(target);
     // });
-    gulp.task('browserify-index-' + name, ['react-' + name], function(){
+    gulp.task('browserify-index-' + name, ['react-' + name, 'transform'], function(){
         return tasks.browserifyIndex(target);
     });
-    gulp.task('browserify-script-' + name, ['react-' + name], function(){
+    gulp.task('browserify-script-' + name, ['react-' + name, 'transform'], function(){
         return tasks.browserifyScript(target);
     });
     gulp.task('browserify-' + name, ['browserify-index-' + name, 'browserify-script-' + name]);
@@ -346,6 +353,7 @@ gulp.task('clean-tmp', cleanTmpTasks);
 gulp.task('minify-css', minifyCssTasks);
 gulp.task('minify-js', minifyJsTasks);
 gulp.task('strip-debug', stripDebugTasks);
+
 
 for(var name in MODES) {
     gulp.task('build-' + name, MODES[name]);
