@@ -13,5 +13,6 @@ var AppContainer    = require('./AppContainer');
   console.info("  Locale   :", Config.locale);
   console.info("  Version  :", Config.version);
 
-
-React.render(React.createElement(AppContainer), document.getElementById('loading'));
+$(function(){
+  React.render( React.createElement(AppContainer), document.body );
+});

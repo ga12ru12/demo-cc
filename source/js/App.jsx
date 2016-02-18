@@ -6,7 +6,7 @@ var IntlMixin   = ReactIntl.IntlMixin;
 var AppAction   = require('./AppAction');
 var AppStore    = require('./AppStore');
 var Utils       = require('./Utils');
-var Login       = require('./Login');
+var Login       = require('./components/Login');
 
 var App = React.createClass({
   mixins: [IntlMixin],
