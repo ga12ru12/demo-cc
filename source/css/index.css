@@ -47,6 +47,6 @@
 
 
 /*---------------Map CSS---------------*/
-.map-div, .map-div > div{
+.map-div{
     height: 100%;
 }
