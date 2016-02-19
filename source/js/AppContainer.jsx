@@ -7,7 +7,7 @@ var App         = require('./App');
 var AppStore    = require('./AppStore');
 
 function initState(){
-  return {Locale: AppStore.getLocale()};
+  return {};
 }
 
 var AppContainer = React.createClass({
@@ -31,7 +31,7 @@ var AppContainer = React.createClass({
 
   render: function(){
     return (
-      <App locales={this.state.Locale.locales} formats={this.state.Locale.formats} messages={this.state.Locale.messages} />
+      <App />
     );
   }
 });

@@ -1,8 +1,8 @@
 'use strict';
 
 var React           = require('react');
+var ReactDOM        = require('react-dom');
 var Config          = require('./config');
-var AppAction       = require('./AppAction');
 var AppContainer    = require('./AppContainer');
 
 //log information for debug
@@ -14,5 +14,5 @@ var AppContainer    = require('./AppContainer');
   console.info("  Version  :", Config.version);
 
 $(function(){
-  React.render( React.createElement(AppContainer), document.body );
+  ReactDOM.render( React.createElement(AppContainer), document.getElementById('loading') );
 });

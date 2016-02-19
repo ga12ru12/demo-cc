@@ -49,16 +49,7 @@ var
     }
     ;
 var $path = {
-    css    : [
-        $src + '/css/intlTelInput.css',
-        $src + '/css/jquery-ui.min.css',
-        $src + '/css/jquery.timepicker.css',
-        $src + '/css/main.css',
-        $src + '/css/step-1.css',
-        $src + '/css/step-2.css',
-        $src + '/css/step-3.css',
-        $src + '/css/step-4.css'
-    ],
+    css    : $src + '/css/*.css',
     cssImg : $src + '/css/images/**/*',
     img    : $src + '/img/**/*',
     html   : [ $src + '/index.html', $src + '/booking.html' ],

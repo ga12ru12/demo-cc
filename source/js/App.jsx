@@ -7,6 +7,7 @@ var AppAction   = require('./AppAction');
 var AppStore    = require('./AppStore');
 var Utils       = require('./Utils');
 var Login       = require('./components/Login');
+var Map         = require('./components/Map');
 
 var App = React.createClass({
   mixins: [IntlMixin],
@@ -15,13 +16,30 @@ var App = React.createClass({
     return AppStore.getState();
   },
 
+  onChange: function() {
+    this.setState(AppStore.getState());
+  },
+
   componentDidMount: function(){
     AppAction.initWebSocket();
+    AppStore.addChangeListener(this.onChange);
+  },
+
+  componentWillUnmount: function(){
+    AppStore.removeChangeListener(this.onChange);
   },
 
   render: function(){
-    return (
-      <Login />
-    );
+    console.log(this.state);
+    if(this.state.state === 'login')
+      return (
+        <Login />
+      );
+    if(this.state.state === 'map')
+      return (
+        <Map />
+      );
   }
 });
+
+module.exports = App;

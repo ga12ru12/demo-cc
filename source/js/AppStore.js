@@ -8,6 +8,8 @@ var Utils         = require('./Utils');
 var Config        = require('./config');
 var Immutable     = require('immutable');
 
+var CHANGE_EVENT  = 'change';
+
 var Setting = Immutable.Record({
   token: '',
   state: 'login'
@@ -16,8 +18,6 @@ var Setting = Immutable.Record({
 var setting = new Setting();
 
 var AppStore = assign({}, EventEmitter.prototype, {
-
-  state: 'login',
 
   emitChange: function(){
     this.emit(CHANGE_EVENT);
@@ -32,7 +32,7 @@ var AppStore = assign({}, EventEmitter.prototype, {
   },
 
   getState: function(){
-    return this.state;
+    return setting.toJS();
   },
 
   dispatcherCallback: function(payload){
@@ -51,7 +51,6 @@ var AppStore = assign({}, EventEmitter.prototype, {
 
       case "got-token-cc":
         setting = setting.set('token', payload.token);
-        this.emitChange();
         break;
 
       case "set-state":

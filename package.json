@@ -17,6 +17,7 @@
     "promise"         : "*",
     "react"           : "*",
     "react-bootstrap" : "*",
+    "react-google-maps": "^4.7.2",
     "react-intl"      : "*",
     "react-kit"       : "*",
     "socket.io-client": "*",

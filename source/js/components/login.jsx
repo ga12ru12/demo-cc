@@ -14,7 +14,7 @@ var Login = React.createClass({
   mixins: [IntlMixin],
 
   getInitialState: function(){
-
+    return {};
   },
 
   componentDidMount: function(){
@@ -34,11 +34,12 @@ var Login = React.createClass({
 
   render: function(){
     return (
-      <div class="login-div">
+      <div className="login-div">
         <form>
+          <h2 className="title">Please sign in</h2>
           <Input type="text" label="Username" ref="username" placeholder="Please enter username" />
           <Input type="password" label="Password" ref="password" placeholder="Please enter password" />
-          <ButtonInput bsStyle="primary" onClick={this.login} />
+          <ButtonInput bsStyle="primary" onClick={this.login} block>Sign in</ButtonInput>
         </form>
       </div>
     );
