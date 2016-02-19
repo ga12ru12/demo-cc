@@ -7,8 +7,9 @@ var IntlMixin       = ReactIntl.IntlMixin;
 var AppAction       = require('../AppAction');
 var AppStore        = require('../AppStore');
 
-var GoogleMap = ReactGoogleMaps.GoogleMap;
-var Marker = ReactGoogleMaps.Marker;
+var GoogleMapLoader = ReactGoogleMaps.GoogleMapLoader;
+var GoogleMap       = ReactGoogleMaps.GoogleMap;
+var Marker          = ReactGoogleMaps.Marker;
 
 var reactBootstrap  = require('react-bootstrap');
 
@@ -36,11 +37,24 @@ var Map = React.createClass({
     var center = {lat: 21.031983, lng: 105.851410};
     return (
       <section className="map-div">
-        <GoogleMap defaultZoom={15} defaultCenter={center}>
-          <Marker
-            defaultPosition={center}
-            title="Hà Lội"/>
-        </GoogleMap>
+        <GoogleMapLoader
+          containerElement={
+            <div
+              style={{
+                height: "100%",
+              }}
+            />
+          }
+          googleMapElement={
+            <GoogleMap defaultZoom={15} defaultCenter={center}>
+              <Marker
+                defaultPosition={center}
+                icon="./img/driverGreen.png"
+                title="Hà Lội"/>
+            </GoogleMap>
+          }
+        />
+
       </section>
     )
   }
