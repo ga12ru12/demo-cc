@@ -17,6 +17,7 @@ var AppAction = {
     socket.on('disconnect', self.websocketClosed);
     socket.on('getTokenCC', self.gotTokenCC);
     socket.on('CCLogin', self.login);
+    socket.on('nd', self.newDrvLogin);
   },
 
   websocketConnected: function(){
@@ -64,6 +65,14 @@ var AppAction = {
         state: "map"
       });
     }
+  },
+
+  newDrvLogin: function(data){
+    console.log('New Drive login: '+data.phone);
+    AppDispatcher.dispatch({
+      type: "new-driver-login",
+      data: data
+    });
   }
 }
 

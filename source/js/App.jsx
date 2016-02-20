@@ -13,11 +13,11 @@ var App = React.createClass({
   mixins: [IntlMixin],
 
   getInitialState: function(){
-    return AppStore.getState();
+    return AppStore.getSetting();
   },
 
   onChange: function() {
-    this.setState(AppStore.getState());
+    this.setState(AppStore.getSetting());
   },
 
   componentDidMount: function(){
@@ -30,12 +30,11 @@ var App = React.createClass({
   },
 
   render: function(){
-    console.log(this.state);
-    //if(this.state.state === 'login')
-    //  return (
-    //    <Login />
-    //  );
-    //if(this.state.state === 'map')
+    if(this.state.state === 'login')
+      return (
+        <Login />
+      );
+    if(this.state.state === 'map')
       return (
         <Map />
       );

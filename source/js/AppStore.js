@@ -11,6 +11,7 @@ var Immutable     = require('immutable');
 var CHANGE_EVENT  = 'change';
 
 var Setting = Immutable.Record({
+  fleetId: '1111',
   token: '',
   state: 'login'
 });
@@ -31,7 +32,7 @@ var AppStore = assign({}, EventEmitter.prototype, {
     this.removeListener(CHANGE_EVENT, callback);
   },
 
-  getState: function(){
+  getSetting: function(){
     return setting.toJS();
   },
 
@@ -56,6 +57,10 @@ var AppStore = assign({}, EventEmitter.prototype, {
       case "set-state":
         setting = setting.set('state', payload.state);
         this.emitChange();
+        break;
+
+      case "new-driver-login":
+
         break;
     }
   }
