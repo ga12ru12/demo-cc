@@ -10,13 +10,18 @@ var Immutable     = require('immutable');
 
 var CHANGE_EVENT  = 'change';
 
+/*-------------Immutable -------------*/
 var Setting = Immutable.Record({
   fleetId: '1111',
   token: '',
   state: 'login'
 });
 
+var ListDrvStatus = Immutable.List();
+
+
 var setting = new Setting();
+var listDrvStatus = new ListDrvStatus();
 
 var AppStore = assign({}, EventEmitter.prototype, {
 
@@ -60,11 +65,19 @@ var AppStore = assign({}, EventEmitter.prototype, {
         break;
 
       case "new-driver-login":
-
+        getDataDriver(payload.data);
+        this.emitChange();
         break;
     }
   }
 });
+
+function getDataDriver(drvInfo){
+  if(drvInfo && drvInfo.phone)
+    listDrvStatus[drvInfo.phone] = drvInfo.status;
+
+  console.log(listDrvStatus.toJS());
+}
 
 AppStore.dispatchToken = AppDispatcher.register(AppStore.dispatcherCallback.bind(AppStore));
 
