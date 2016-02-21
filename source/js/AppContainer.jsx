@@ -5,6 +5,8 @@ var ReactIntl   = require('react-intl');
 var IntlMixin   = ReactIntl.IntlMixin;
 var App         = require('./App');
 var AppStore    = require('./AppStore');
+var Utils       = require('./Utils');
+var listEvent   = Utils.events;
 
 function initState(){
   return {};
@@ -22,11 +24,11 @@ var AppContainer = React.createClass({
   },
 
   componentDidMount: function() {
-    AppStore.addChangeListener(this.onChange);
+    AppStore.addChangeListener(listEvent.CHANGE_STATE_EVENT, this.onChange);
   },
 
   componentWillUnmount: function() {
-    AppStore.removeChangeListener(this.onChange);
+    AppStore.removeChangeListener(listEvent.CHANGE_STATE_EVENT, this.onChange);
   },
 
   render: function(){

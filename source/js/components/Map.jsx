@@ -6,6 +6,8 @@ var ReactIntl       = require('react-intl');
 var IntlMixin       = ReactIntl.IntlMixin;
 var AppAction       = require('../AppAction');
 var AppStore        = require('../AppStore');
+var Utils       = require('./Utils');
+var listEvent   = Utils.events;
 
 var GoogleMapLoader = ReactGoogleMaps.GoogleMapLoader;
 var GoogleMap       = ReactGoogleMaps.GoogleMap;
@@ -21,16 +23,16 @@ var Map = React.createClass({
     return {};
   },
 
-  onChange: function(){
+  onChangeDrv: function(){
 
   },
 
   componentDidMount: function(){
-    AppStore.addChangeListener(this.onChange);
+    AppStore.addChangeListener(listEvent.CHANGE_DRV_EVENT, this.onChangeDrv);
   },
 
   componentWillUnmount: function(){
-    AppStore.removeChangeListener(this.onChange);
+    AppStore.removeChangeListener(listEvent.CHANGE_DRV_EVENT, this.onChangeDrv);
   },
 
   render: function(){

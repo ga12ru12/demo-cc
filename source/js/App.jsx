@@ -6,6 +6,7 @@ var IntlMixin   = ReactIntl.IntlMixin;
 var AppAction   = require('./AppAction');
 var AppStore    = require('./AppStore');
 var Utils       = require('./Utils');
+var listEvent   = Utils.events;
 var Login       = require('./components/Login');
 var Map         = require('./components/Map');
 
@@ -22,11 +23,11 @@ var App = React.createClass({
 
   componentDidMount: function(){
     AppAction.initWebSocket();
-    AppStore.addChangeListener(this.onChange);
+    AppStore.addChangeListener(listEvent.CHANGE_STATE_EVENT, this.onChange);
   },
 
   componentWillUnmount: function(){
-    AppStore.removeChangeListener(this.onChange);
+    AppStore.removeChangeListener(listEvent.CHANGE_STATE_EVENT, this.onChange);
   },
 
   render: function(){

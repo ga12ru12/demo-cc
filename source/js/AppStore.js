@@ -5,10 +5,9 @@ var EventEmitter  = require('events').EventEmitter;
 var Immutable     = require('immutable');
 var AppDispatcher = require('./AppDispatcher');
 var Utils         = require('./Utils');
+var listEvent     = Utils.events;
 var Config        = require('./config');
 var Immutable     = require('immutable');
-
-var CHANGE_EVENT  = 'change';
 
 /*-------------Immutable -------------*/
 var Setting = Immutable.Record({
@@ -17,23 +16,29 @@ var Setting = Immutable.Record({
   state: 'login'
 });
 
-var ListDrvStatus = Immutable.List();
+var ListDrv = Immutable.List();
+var DrvInfo = Immutable.Record({
+  phone: '',
+  fleetId: '',
+  status: ''
+});
 
 
 var setting = new Setting();
-var listDrvStatus = new ListDrvStatus();
+var listDrv = new ListDrv();
+var listDrvIndex = {};
 
 var AppStore = assign({}, EventEmitter.prototype, {
 
-  emitChange: function(){
+  emitChange: function(CHANGE_EVENT){
     this.emit(CHANGE_EVENT);
   },
 
-  addChangeListener: function(callback) {
+  addChangeListener: function(CHANGE_EVENT, callback) {
     this.on(CHANGE_EVENT, callback);
   },
 
-  removeChangeListener: function(callback) {
+  removeChangeListener: function(CHANGE_EVENT, callback) {
     this.removeListener(CHANGE_EVENT, callback);
   },
 
@@ -44,15 +49,15 @@ var AppStore = assign({}, EventEmitter.prototype, {
   dispatcherCallback: function(payload){
     switch(payload.type) {
       case 'web-socket-connected':
-        this.emitChange();
+        this.emitChange(listEvent.CHANGE_STATE_EVENT);
         break;
 
       case 'web-socket-disconnected':
-        this.emitChange();
+        this.emitChange(listEvent.CHANGE_STATE_EVENT);
         break;
 
       case 'web-socket-closed':
-        this.emitChange();
+        this.emitChange(listEvent.CHANGE_STATE_EVENT);
         break;
 
       case "got-token-cc":
@@ -61,22 +66,25 @@ var AppStore = assign({}, EventEmitter.prototype, {
 
       case "set-state":
         setting = setting.set('state', payload.state);
-        this.emitChange();
+        this.emitChange(listEvent.CHANGE_STATE_EVENT);
         break;
 
       case "new-driver-login":
         getDataDriver(payload.data);
-        this.emitChange();
+        this.emitChange(listEvent.CHANGE_DRV_EVENT);
         break;
     }
   }
 });
 
-function getDataDriver(drvInfo){
-  if(drvInfo && drvInfo.phone)
-    listDrvStatus[drvInfo.phone] = drvInfo.status;
+function getDataDriver(data){
+  if(data && data.phone){
+    var drvInfo = new DrvInfo(data);
+    listDrv.push(drvInfo);
+    listDrvIndex[data.phone] = listDrv.count() -1;
+  }
 
-  console.log(listDrvStatus.toJS());
+  console.log(listDrv.toJS());
 }
 
 AppStore.dispatchToken = AppDispatcher.register(AppStore.dispatcherCallback.bind(AppStore));
