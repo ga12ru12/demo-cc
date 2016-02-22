@@ -25,17 +25,23 @@ var Login = React.createClass({
 
   },
 
+  handleSubmit: function(){
+    e.preventDefault();
+    this.login();
+  },
+
   login: function(){
     AppAction.getTokenCC({
       username: this.refs.username.getValue(),
-      password: this.refs.password.getValue()
+      password: this.refs.password.getValue(),
+      fleetId: AppStore.getSetting().fleetId
     });
   },
 
   render: function(){
     return (
       <div className="login-div">
-        <form>
+        <form onSubmit={this.handleSubmit}>
           <h2 className="title">Please sign in</h2>
           <Input type="text" label="Username" ref="username" placeholder="Please enter username" />
           <Input type="password" label="Password" ref="password" placeholder="Please enter password" />

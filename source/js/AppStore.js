@@ -8,6 +8,8 @@ var Utils         = require('./Utils');
 var listEvent     = Utils.events;
 var Config        = require('./config');
 var Immutable     = require('immutable');
+var _             = require('lodash');
+var async         = require('async');
 
 /*-------------Immutable -------------*/
 var Setting = Immutable.Record({
@@ -16,16 +18,18 @@ var Setting = Immutable.Record({
   state: 'login'
 });
 
-var ListDrv = Immutable.List();
+var ListDrv = Immutable.List.of();
 var DrvInfo = Immutable.Record({
-  phone: '',
-  fleetId: '',
-  status: ''
+  phone     : '',
+  fleetId   : '',
+  userId    : '',
+  status    : '',
+  lat       : 0,
+  lng       : 0
 });
 
 
 var setting = new Setting();
-var listDrv = new ListDrv();
 var listDrvIndex = {};
 
 var AppStore = assign({}, EventEmitter.prototype, {
@@ -44,6 +48,10 @@ var AppStore = assign({}, EventEmitter.prototype, {
 
   getSetting: function(){
     return setting.toJS();
+  },
+
+  getListDrv: function(){
+    return ListDrv.toJS();
   },
 
   dispatcherCallback: function(payload){
@@ -69,22 +77,67 @@ var AppStore = assign({}, EventEmitter.prototype, {
         this.emitChange(listEvent.CHANGE_STATE_EVENT);
         break;
 
+      case 'init-list-drv':
+        initListDrv(payload.data);
+        this.emitChange(listEvent.CHANGE_DRV_EVENT);
+        break;
+
       case "new-driver-login":
         getDataDriver(payload.data);
         this.emitChange(listEvent.CHANGE_DRV_EVENT);
+        break;
+
+      case 'update-location-drv':
+        updateLocationDrv(payload.data);
+        this.emitChange(listEvent.CHANGE_DRV_EVENT);
+        break;
+
+      case "drv-logout":
+        if(typeof listDrvIndex[payload.phone] !== 'undefined'){
+          ListDrv = ListDrv.delete(listDrvIndex[payload.phone]);
+          delete listDrvIndex[payload.phone];
+          this.emitChange(listEvent.CHANGE_DRV_EVENT);
+        }
         break;
     }
   }
 });
 
-function getDataDriver(data){
+function getDataDriver(data, cb){
   if(data && data.phone){
-    var drvInfo = new DrvInfo(data);
-    listDrv.push(drvInfo);
-    listDrvIndex[data.phone] = listDrv.count() -1;
+    if(typeof listDrvIndex[data.phone] !== 'undefined'){
+      var drvInfo = ListDrv.get(listDrvIndex[data.phone]);
+      if(data.status) drvInfo = drvInfo.set('status', data.status);
+      ListDrv = ListDrv.update(listDrvIndex[data.phone], function(){return drvInfo});
+    }else{
+      var drvInfo = new DrvInfo({
+        fleetId : data.fleetId,
+        status  : data.status,
+        phone   : data.phone,
+        userId  : data.userId,
+        lat     : data.loc.coordinates[1],
+        lng     : data.loc.coordinates[0]
+      });
+      ListDrv = ListDrv.push(drvInfo);
+      listDrvIndex[data.phone] = ListDrv.size -1;
+    }
   }
+  if(cb) return cb();
+}
 
-  console.log(listDrv.toJS());
+function initListDrv(data){
+  async.forEachLimit(data, 100, function(drvInfo, cb){
+    getDataDriver(drvInfo, cb);
+  }, function(){});
+}
+
+function updateLocationDrv(data){
+  if(data.length === 3 && typeof listDrvIndex[data[2]] !== 'undefined'){
+    var drvInfo = ListDrv.get(listDrvIndex[data[2]]);
+    drvInfo = drvInfo.set('lat', data[0]);
+    drvInfo = drvInfo.set('lng', data[1]);
+    ListDrv = ListDrv.update(listDrvIndex[data[2]], function(){return drvInfo});
+  }
 }
 
 AppStore.dispatchToken = AppDispatcher.register(AppStore.dispatcherCallback.bind(AppStore));

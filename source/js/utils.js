@@ -5,5 +5,14 @@ module.exports = {
     CHANGE_STATE_EVENT: 'change_state',
     CHANGE_DRV_EVENT: 'change_drv',
     CHANGE_BOOKING_EVENT: 'change_booking'
+  },
+  iconOnMap:{
+    "bookOff"     : './img/driverGray.png',
+    "bookIn"      : './img/driverGreen.png',
+    "offered"     : './img/driverPurple.png',
+    "booked"      : './img/driverYellow.png',
+    "arrived"     : './img/driverOrange.png',
+    "engaged"     : './img/driverRed.png',
+    "droppedOff"  : './img/driverRedDrop.png'
   }
 }

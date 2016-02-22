@@ -17,20 +17,19 @@ var AppAction = {
     socket.on('disconnect', self.websocketClosed);
     socket.on('getTokenCC', self.gotTokenCC);
     socket.on('CCLogin', self.login);
+    socket.on('getListDrvOnl', self.initListDrv);
     socket.on('nd', self.newDrvLogin);
+    socket.on('d', self.updateDrv);
+    socket.on('f1', self.updateLocationDrv);
+    socket.on('offline', self.drvLogout)
   },
 
   websocketConnected: function(){
     console.log('Websocket is connected.');
+    if(localStorage.getItem("token"))
+      socket.emit('CCLogin', localStorage.getItem("token"));
     AppDispatcher.dispatch({
       type: 'web-socket-connected'
-    });
-  },
-
-  websocketClosed: function(){
-    console.log('Websocket was closed.');
-    AppDispatcher.dispatch({
-      type: 'web-socket-closed'
     });
   },
 
@@ -50,6 +49,7 @@ var AppAction = {
     console.log('Got token CC');
     if(data && data.code){
       socket.emit('CCLogin', data.token);
+      localStorage.setItem("token", data.token);
       AppDispatcher.dispatch({
         type: 'got-token-cc',
         token: data.token
@@ -67,11 +67,50 @@ var AppAction = {
     }
   },
 
+  loadDrvToMap: function(){
+    socket.emit('getListDrvOnl');
+  },
+
+  initListDrv: function(data){
+    console.log('Init list Driver: ');
+    if(data.code){
+      AppDispatcher.dispatch({
+        type: "init-list-drv",
+        data: data.listDrv
+      });
+    }
+  },
+
   newDrvLogin: function(data){
     console.log('New Drive login: '+data.phone);
     AppDispatcher.dispatch({
       type: "new-driver-login",
       data: data
+    });
+  },
+
+  updateDrv: function(data){
+    console.log('Update Drv Info: '+data.param.phone);
+    AppDispatcher.dispatch({
+      type: "new-driver-login",
+      data: data.param
+    });
+  },
+
+  updateLocationDrv: function(data){
+    console.log('Update location drv');
+    console.log(data);
+    AppDispatcher.dispatch({
+      type: 'update-location-drv',
+      data: data
+    });
+  },
+
+  drvLogout: function(phone){
+    console.log('Drv logout: '+phone);
+    AppDispatcher.dispatch({
+      type: 'drv-logout',
+      phone: phone
     });
   }
 }

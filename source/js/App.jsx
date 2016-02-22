@@ -35,10 +35,11 @@ var App = React.createClass({
       return (
         <Login />
       );
-    if(this.state.state === 'map')
+    if(this.state.state === 'map'){
       return (
         <Map />
       );
+    }
   }
 });
 
