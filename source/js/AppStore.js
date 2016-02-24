@@ -10,10 +10,11 @@ var Config        = require('./config');
 var Immutable     = require('immutable');
 var _             = require('lodash');
 var async         = require('async');
+var update        = require('react-addons-update');
 
 /*-------------Immutable -------------*/
 var Setting = Immutable.Record({
-  fleetId: '1111',
+  fleetId: 'quang',
   token: '',
   state: 'login'
 });
@@ -32,6 +33,10 @@ var DrvInfo = Immutable.Record({
 var setting = new Setting();
 var listDrvIndex = {};
 
+
+
+var testListDrv = {};
+var map;
 var AppStore = assign({}, EventEmitter.prototype, {
 
   emitChange: function(CHANGE_EVENT){
@@ -46,6 +51,10 @@ var AppStore = assign({}, EventEmitter.prototype, {
     this.removeListener(CHANGE_EVENT, callback);
   },
 
+  setMapToSetting: function(map){
+    map = map;
+  },
+
   getSetting: function(){
     return setting.toJS();
   },
@@ -55,6 +64,7 @@ var AppStore = assign({}, EventEmitter.prototype, {
   },
 
   dispatcherCallback: function(payload){
+    var self = this;
     switch(payload.type) {
       case 'web-socket-connected':
         this.emitChange(listEvent.CHANGE_STATE_EVENT);
@@ -75,6 +85,10 @@ var AppStore = assign({}, EventEmitter.prototype, {
       case "set-state":
         setting = setting.set('state', payload.state);
         this.emitChange(listEvent.CHANGE_STATE_EVENT);
+        break;
+
+      case "set-map":
+        map = payload.map;
         break;
 
       case 'init-list-drv':
@@ -107,7 +121,7 @@ function getDataDriver(data, cb){
   if(data && data.phone){
     if(typeof listDrvIndex[data.phone] !== 'undefined'){
       var drvInfo = ListDrv.get(listDrvIndex[data.phone]);
-      if(data.status) drvInfo = drvInfo.set('status', data.status);
+      if(data.status) drvInfo['status'] = data.status;
       ListDrv = ListDrv.update(listDrvIndex[data.phone], function(){return drvInfo});
     }else{
       var drvInfo = new DrvInfo({
@@ -118,24 +132,39 @@ function getDataDriver(data, cb){
         lat     : data.loc.coordinates[1],
         lng     : data.loc.coordinates[0]
       });
-      ListDrv = ListDrv.push(drvInfo);
+      ListDrv = ListDrv.push(drvInfo.toJS());
       listDrvIndex[data.phone] = ListDrv.size -1;
     }
   }
+
   if(cb) return cb();
 }
 
 function initListDrv(data){
-  async.forEachLimit(data, 100, function(drvInfo, cb){
-    getDataDriver(drvInfo, cb);
-  }, function(){});
+  //async.forEachLimit(data, 100, function(drvInfo, cb){
+  //  getDataDriver(drvInfo, cb);
+  //}, function(){});
+  var contentString = '13123';
+
+  var infowindow = new google.maps.InfoWindow({
+    content: contentString
+  });
+
+  var marker = new google.maps.Marker({
+    position: {lat: 21.031983, lng: 105.851410},
+    map: map,
+    title: 'Uluru (Ayers Rock)'
+  });
+  marker.addListener('click', function() {
+    infowindow.open(map, marker);
+  });
 }
 
 function updateLocationDrv(data){
   if(data.length === 3 && typeof listDrvIndex[data[2]] !== 'undefined'){
     var drvInfo = ListDrv.get(listDrvIndex[data[2]]);
-    drvInfo = drvInfo.set('lat', data[0]);
-    drvInfo = drvInfo.set('lng', data[1]);
+    drvInfo['lat'] = data[0];
+    drvInfo['lng'] = data[1];
     ListDrv = ListDrv.update(listDrvIndex[data[2]], function(){return drvInfo});
   }
 }

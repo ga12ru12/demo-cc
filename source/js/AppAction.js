@@ -67,6 +67,13 @@ var AppAction = {
     }
   },
 
+  setMapToSetting : function(map){
+    AppDispatcher.dispatch({
+      type: "set-map",
+      map: map
+    });
+  },
+
   loadDrvToMap: function(){
     socket.emit('getListDrvOnl');
   },
