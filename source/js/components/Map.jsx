@@ -8,7 +8,6 @@ var AppAction       = require('../AppAction');
 var AppStore        = require('../AppStore');
 var Utils           = require('../Utils');
 var listEvent       = Utils.events;
-var listIcon        = Utils.iconOnMap;
 
 var GoogleMapLoader = ReactGoogleMaps.GoogleMapLoader;
 var GoogleMap       = ReactGoogleMaps.GoogleMap;
@@ -28,16 +27,6 @@ var Map = React.createClass({
     };
   },
 
-  onChangeDrv: function(){
-    this.setState({
-      listDrv: AppStore.getListDrv()
-    });
-  },
-
-  onChangeState: function(){
-
-  },
-
   initMap: function(){
     this.map = new google.maps.Map(document.getElementById('map-div'), {
       center: {lat: 21.031983, lng: 105.851410},
@@ -50,13 +39,11 @@ var Map = React.createClass({
     var self = this;
     self.initMap();
     AppAction.loadDrvToMap();
-    AppStore.addChangeListener(listEvent.CHANGE_STATE_EVENT, this.onChangeState);
-    AppStore.addChangeListener(listEvent.CHANGE_DRV_EVENT, this.onChangeDrv);
+
   },
 
   componentWillUnmount: function(){
-    AppStore.addChangeListener(listEvent.CHANGE_STATE_EVENT, this.onChangeState);
-    AppStore.removeChangeListener(listEvent.CHANGE_DRV_EVENT, this.onChangeDrv);
+
   },
 
   render: function(){

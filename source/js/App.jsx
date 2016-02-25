@@ -9,6 +9,7 @@ var Utils       = require('./Utils');
 var listEvent   = Utils.events;
 var Login       = require('./components/Login');
 var Map         = require('./components/Map');
+var Menu         = require('./components/Menu');
 
 var App = React.createClass({
   mixins: [IntlMixin],
@@ -37,7 +38,10 @@ var App = React.createClass({
       );
     if(this.state.state === 'map'){
       return (
-        <Map />
+        <div>
+          <Map />
+          <Menu />
+        </div>
       );
     }
   }

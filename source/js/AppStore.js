@@ -6,6 +6,7 @@ var Immutable     = require('immutable');
 var AppDispatcher = require('./AppDispatcher');
 var Utils         = require('./Utils');
 var listEvent     = Utils.events;
+var listIcon        = Utils.iconOnMap;
 var Config        = require('./config');
 var Immutable     = require('immutable');
 var _             = require('lodash');
@@ -21,22 +22,23 @@ var Setting = Immutable.Record({
 
 var ListDrv = Immutable.List.of();
 var DrvInfo = Immutable.Record({
-  phone     : '',
-  fleetId   : '',
-  userId    : '',
-  status    : '',
-  lat       : 0,
-  lng       : 0
+  phone       : '',
+  fleetId     : '',
+  userId      : '',
+  status      : '',
+  vehicleType : '',
+  plateNumber : '',
+  name        : '',
+  lat         : 0,
+  lng         : 0
 });
 
 
 var setting = new Setting();
 var listDrvIndex = {};
+var listMarkerByPhone = {};
+var mapGlobal;
 
-
-
-var testListDrv = {};
-var map;
 var AppStore = assign({}, EventEmitter.prototype, {
 
   emitChange: function(CHANGE_EVENT){
@@ -52,7 +54,7 @@ var AppStore = assign({}, EventEmitter.prototype, {
   },
 
   setMapToSetting: function(map){
-    map = map;
+    mapGlobal = map;
   },
 
   getSetting: function(){
@@ -87,10 +89,6 @@ var AppStore = assign({}, EventEmitter.prototype, {
         this.emitChange(listEvent.CHANGE_STATE_EVENT);
         break;
 
-      case "set-map":
-        map = payload.map;
-        break;
-
       case 'init-list-drv':
         initListDrv(payload.data);
         this.emitChange(listEvent.CHANGE_DRV_EVENT);
@@ -110,6 +108,7 @@ var AppStore = assign({}, EventEmitter.prototype, {
         if(typeof listDrvIndex[payload.phone] !== 'undefined'){
           ListDrv = ListDrv.delete(listDrvIndex[payload.phone]);
           delete listDrvIndex[payload.phone];
+          listMarkerByPhone[payload.phone].setMap(null);
           this.emitChange(listEvent.CHANGE_DRV_EVENT);
         }
         break;
@@ -121,19 +120,26 @@ function getDataDriver(data, cb){
   if(data && data.phone){
     if(typeof listDrvIndex[data.phone] !== 'undefined'){
       var drvInfo = ListDrv.get(listDrvIndex[data.phone]);
-      if(data.status) drvInfo['status'] = data.status;
+      if(data.status){
+        drvInfo['status'] = data.status;
+        listMarkerByPhone[drvInfo.phone].setIcon(listIcon[drvInfo['status']]);
+      }
       ListDrv = ListDrv.update(listDrvIndex[data.phone], function(){return drvInfo});
     }else{
       var drvInfo = new DrvInfo({
-        fleetId : data.fleetId,
-        status  : data.status,
-        phone   : data.phone,
-        userId  : data.userId,
-        lat     : data.loc.coordinates[1],
-        lng     : data.loc.coordinates[0]
+        fleetId     : data.fleetId,
+        status      : data.status,
+        phone       : data.phone,
+        userId      : data.userId,
+        vehicleType : data.vehicle.vehicleType,
+        plateNumber : data.vehicle.plateNumber,
+        name        : data.firstName ? data.firstName+' '+data.lastName : data.lastName,
+        lat         : data.loc.coordinates[1],
+        lng         : data.loc.coordinates[0]
       });
       ListDrv = ListDrv.push(drvInfo.toJS());
       listDrvIndex[data.phone] = ListDrv.size -1;
+      createMarker(drvInfo.toJS());
     }
   }
 
@@ -141,23 +147,30 @@ function getDataDriver(data, cb){
 }
 
 function initListDrv(data){
-  //async.forEachLimit(data, 100, function(drvInfo, cb){
-  //  getDataDriver(drvInfo, cb);
-  //}, function(){});
-  var contentString = '13123';
+  async.forEachLimit(data, 100, function(drvInfo, cb){
+    getDataDriver(drvInfo, cb);
+  }, function(){});
+}
+
+function createMarker(drvInfo){
+  var contentString = '<div class="infoWindowContent"><p class="iw_driver">'+drvInfo.name+'/ '+drvInfo.phone+'</p><p class="iw_vehicle">'+drvInfo.vehicleType+'/ '+drvInfo.plateNumber+'</p></div>';
 
   var infowindow = new google.maps.InfoWindow({
     content: contentString
   });
 
   var marker = new google.maps.Marker({
-    position: {lat: 21.031983, lng: 105.851410},
-    map: map,
-    title: 'Uluru (Ayers Rock)'
+    position: {lat: drvInfo.lat, lng: drvInfo.lng},
+    map: mapGlobal,
+    icon: listIcon[drvInfo.status],
+    title: drvInfo.name
   });
+
   marker.addListener('click', function() {
-    infowindow.open(map, marker);
+    infowindow.open(mapGlobal, marker);
   });
+
+  listMarkerByPhone[drvInfo.phone] = marker;
 }
 
 function updateLocationDrv(data){
@@ -166,6 +179,7 @@ function updateLocationDrv(data){
     drvInfo['lat'] = data[0];
     drvInfo['lng'] = data[1];
     ListDrv = ListDrv.update(listDrvIndex[data[2]], function(){return drvInfo});
+    listMarkerByPhone[data[2]].setPosition({lat: data[0], lng: data[1]});
   }
 }
 
