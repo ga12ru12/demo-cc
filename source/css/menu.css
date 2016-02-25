@@ -18,3 +18,32 @@
 .menu-div .total-div{
     text-align: center;
 }
+.menu-div .list-drv-div{
+    overflow-y: auto;
+}
+.menu-div .drv-div{
+    border-left-width: 10px;
+    border-left-style: solid;
+    border-top: gray solid thin;
+}
+.menu-div .list-drv-div .gray{
+    border-left-color: #525252;
+}
+.menu-div .list-drv-div .green{
+    border-left-color: #3CB401;
+}
+.menu-div .list-drv-div .orange{
+    border-left-color: #FD9B01;
+}
+.menu-div .list-drv-div .purple{
+    border-left-color: #631F9C;
+}
+.menu-div .list-drv-div .red{
+    border-left-color: #CE0001;
+}
+.menu-div .list-drv-div .red-drop{
+    border-left-color: #FD3131;
+}
+.menu-div .list-drv-div .yellow{
+    border-left-color: #FDC501;
+}

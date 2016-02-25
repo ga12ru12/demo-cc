@@ -14,5 +14,14 @@ module.exports = {
     "arrived"     : './img/driverOrange.png',
     "engaged"     : './img/driverRed.png',
     "droppedOff"  : './img/driverRedDrop.png'
+  },
+  classListDrv:{
+    "bookOff"     : 'gray',
+    "bookIn"      : 'green',
+    "offered"     : 'purple',
+    "booked"      : 'yellow',
+    "arrived"     : 'orange',
+    "engaged"     : 'red',
+    "droppedOff"  : 'red-drop'
   }
 }
